@@ -5,6 +5,7 @@
 #include "MUSI6106Config.h"
 
 #include "RingBuffer.h"
+#include "CombFilter.hpp"
 
 using std::cout;
 using std::endl;
