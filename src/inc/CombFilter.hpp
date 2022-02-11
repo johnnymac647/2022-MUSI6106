@@ -19,18 +19,21 @@ template <class T>
 class CCombFilter{
     public:
     explicit CCombFilter(){
-        m_pDelayLine = new T[m_iDelayLength];
+
     };
     
     virtual ~CCombFilter(){
-        delete[] m_pDelayLine;
-        m_pDelayLine = 0;
+
     }
     
+    void applyDelay(CRingBuffer<T> x, CRingBuffer<T> y){
+        
+    }
     
     private:
-    int m_iDelayLength;
-    T* m_pDelayLine;
+    int m_iDelayLengthSamps;
+    CRingBuffer<T> m_XBuffer = new CRingBuffer<T>(2*m_iDelayLengthSamps); //buffer to hold the original, undelayed signal
+    CRingBuffer<T> m_YBuffer = new CRingBuffer<T>(2*m_iDelayLengthSamps); //buffer to hold the final signal that we will eventually write into our wav file
 /*
     Things we're going to need:
         Delay line
