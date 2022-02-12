@@ -83,7 +83,8 @@ int main(int argc, char* argv[])
     
     //create and initialize the comb filter
     CCombFilterIf::create(phCombFilter);
-    phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels)
+    phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+    phCombFilter->setParam(CCombFilterIf::kParamGain, f_gainValue);
 
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
@@ -133,6 +134,7 @@ int main(int argc, char* argv[])
         {
             for (int c = 0; c < stFileSpec.iNumChannels; c++)
             {
+                
 //                hOutputFile << ppfAudioData[c][i] << "\t";
             }
 //            hOutputFile << endl;

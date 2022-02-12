@@ -99,17 +99,18 @@ public:
 protected:
     CCombFilterIf ();
     virtual ~CCombFilterIf ();
+    
+    CombFilterType_t m_eFilterType;
+    float           m_fMaxDelayLengthInS;
+    int             m_iMaxDelayLengthInSamples;
+    float           m_fGainValue;
+    int             m_iNumChannels;
 
 private:
     bool            m_bIsInitialized;   //!< internal bool to check whether the init function has been called
     CCombFilterBase *m_pCCombFilter;    //!< handle of the comb filter
     float           m_fSampleRate;      //!< audio sample rate in Hz
     //!
-    
-    CombFilterType_t m_eFilterType;
-    float           m_fMaxDelayLengthInS;
-    float           m_fGainValue;
-    int             m_iNumChannels;
 };
 
 #endif // #if !defined(__CombFilterIf_hdr__)
