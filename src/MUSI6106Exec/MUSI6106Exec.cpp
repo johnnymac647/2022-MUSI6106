@@ -4,6 +4,7 @@
 
 #include "MUSI6106Config.h"
 
+#include "RingBuffer.h"
 #include "AudioFileIf.h"
 #include "CombFilterIf.h"
 
