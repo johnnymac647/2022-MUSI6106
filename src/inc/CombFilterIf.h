@@ -108,7 +108,7 @@ private:
     
     CombFilterType_t m_eFilterType;
     float           m_fMaxDelayLengthInS;
-    float           m_fSampleRateInHz;
+    float           m_fGainValue;
     int             m_iNumChannels;
 };
 

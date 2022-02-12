@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
     float **ppfAudioData = 0;
 
     CAudioFileIf *phAudioFile = 0;
+    CCombFilter *phCombFilter = 0;
     std::fstream hOutputFile;
     CAudioFileIf::FileSpec_t stFileSpec;
 
@@ -37,13 +38,35 @@ int main(int argc, char* argv[])
     // parse command line arguments
     if (argc < 2)
     {
-        cout << "Missing audio input path!";
+        cout << "Testing Comb Filter Implementation\n";
+        
+        cout << "Test 1: FIR: Output is zero if input freq matches feedforward\n";
+        //TODO: Implement Test 1
+        cout << "Test 2: IIR: amount of magnitude increase/decrease if input freq matches feedback\n";
+        //TODO: Implement Test 2
+        cout << "Test 3: FIR/IIR: correct result for VARYING input block size\n";
+        //TODO: Implement Test 3
+        cout << "Test 4: FIR/IIR: correct processing for zero input signal\n";
+        //TODO: Implement Test 4
+        cout << "Test 5 One more additional MEANINGFUL test to verify your filter implementation\n";
+        //TODO: Implement Test 5
+        
         return -1;
+    }
+    else if (argc < 5)
+    {
+        cout << "Not enough parameters passed.";
+        return -1
     }
     else
     {
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
+        
+        CCombFilterIf::CombFilterType_t eFilterType = argv[2];
+        float f_gainValue = argv[3];
+        float f_delayValue = argv[4];
+        
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -57,6 +80,10 @@ int main(int argc, char* argv[])
         return -1;
     }
     phAudioFile->getFileSpec(stFileSpec);
+    
+    //create and initialize the comb filter
+    CCombFilterIf::create(phCombFilter);
+    phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels)
 
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
@@ -106,9 +133,9 @@ int main(int argc, char* argv[])
         {
             for (int c = 0; c < stFileSpec.iNumChannels; c++)
             {
-                hOutputFile << ppfAudioData[c][i] << "\t";
+//                hOutputFile << ppfAudioData[c][i] << "\t";
             }
-            hOutputFile << endl;
+//            hOutputFile << endl;
         }
     }
 
