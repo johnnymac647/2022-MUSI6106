@@ -6,7 +6,7 @@
 //
 
 #include "CombFilter.h"
-
+#include "RingBuffer.h"
 
 //constructors for CCombFilterBase, CFIRFilter, CIIRFilter
 //CCombFilterBase::CCombFilterBase () :

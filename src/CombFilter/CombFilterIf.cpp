@@ -70,8 +70,6 @@ Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
 
 Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
-    
-
 
     m_eFilterType = eFilterType;
     m_fSampleRate = fSampleRateInHz;

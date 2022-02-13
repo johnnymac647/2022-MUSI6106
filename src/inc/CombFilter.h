@@ -21,16 +21,12 @@ class CCombFilterBase : CCombFilterIf{
 public:
     explicit CCombFilterBase(int iNumberOfChannels){
         m_iNumberOfChannels = iNumberOfChannels;
-
         m_iBufferSize = setBufferSize();
         m_pRBDelayLine = new CRingBuffer<float>(m_iBufferSize);
     }
-    //setting delay or gain
-    //taking the block size
-    //need to define constructors/destructors - look in AudioFile
-    
 
-    
+    Error_t init(int iNumberOfChannels);
+
     Error_t process(float **ppfInput, float **ppfOutput, int iNumFrames);
 
     int setBufferSize(){

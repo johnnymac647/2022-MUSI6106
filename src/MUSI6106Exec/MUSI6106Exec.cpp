@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <fstream>
 #include <ctime>
 
 #include "MUSI6106Config.h"
@@ -78,8 +79,8 @@ int main(int argc, char* argv[])
         } else if (argv[2] == "IIR"){
             eFilterType = CCombFilterIf::kCombIIR;
         } else{
-            cout << "An invalid argument was passed for the filter type. Valid options include \"FIR\" and \"IIR\".";
-            cout << "Using the an FIR filter as the default.";
+            cout << "An invalid argument was passed for the filter type. Valid options include \"FIR\" and \"IIR\".  ";
+            cout << "Using the an FIR filter as the default.\n";
             eFilterType = CCombFilterIf::kCombFIR;
         }
 
@@ -98,11 +99,19 @@ int main(int argc, char* argv[])
         CAudioFileIf::destroy(phInputAudioFile);
         return -1;
     }
+    else{
+        cout << "Successfully opened input file!\n";
+    }
     phInputAudioFile->getFileSpec(stFileSpec);
 
     //create the output wave file
+//    std::ifstream  src(sInputFilePath, std::ios::binary);
+//    std::ofstream  dst(sOutputFilePath,   std::ios::binary);
+//    dst << src.rdbuf();
     std::ofstream outputFile(sOutputFilePath);
     outputFile.close();
+    cout << "Successfully created output file!\n";
+    CAudioFileIf::create(phOutputAudioFile);
     phOutputAudioFile->openFile(sOutputFilePath, CAudioFileIf::kFileWrite);
     if (!phOutputAudioFile->isOpen())
     {
@@ -111,17 +120,21 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    else{
+        cout << "Successfully opened output file!\n";
+    }
+
     //create and initialize the comb filter
     CCombFilterIf::create(phCombFilter);
-    phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
-    phCombFilter->setParam(CCombFilterIf::kParamGain, f_gainValue);
-
+//    phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+//    phCombFilter->setParam(CCombFilterIf::kParamGain, f_gainValue);
+    cout << "Successfully created comb filter!\n";
 
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
     ppfInputAudioData = new float*[stFileSpec.iNumChannels];
     ppfOutputAudioData = new float*[stFileSpec.iNumChannels];
-    
+
     for (int i = 0; i < stFileSpec.iNumChannels; i++){
         ppfInputAudioData[i] = new float[kBlockSize];
         ppfOutputAudioData[i] = new float[kBlockSize];
@@ -151,7 +164,7 @@ int main(int argc, char* argv[])
 
         // read data (iNumOfFrames might be updated!)
         phInputAudioFile->readData(ppfInputAudioData, iNumFrames);
-        
+
         cout << "\r" << "reading and writing";
 
         // write
