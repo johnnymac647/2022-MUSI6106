@@ -102,7 +102,7 @@ Error_t CCombFilterIf::reset ()
 
 Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
 {
-    return m_pCCombFilter:process(**ppfInputBuffer, **ppfOutputBuffer, iNumberOfFrames);
+    return m_pCCombFilter->process(**ppfInputBuffer, **ppfOutputBuffer, iNumberOfFrames);
 }
 
 Error_t CCombFilterIf::setParam (FilterParam_t eParam, float fParamValue)
@@ -117,19 +117,19 @@ Error_t CCombFilterIf::setParam (FilterParam_t eParam, float fParamValue)
             return Error_t::kNoError;
         default:
             return Error_t::kFunctionInvalidArgsError;
-            
     }
 
 }
 
 float CCombFilterIf::getParam (FilterParam_t eParam) const
 {
-    if(eParam == kParamGain){
-        return m_fGainValue;
-    } else if (eParam == kParamDelay){
-        return m_fMaxDelayLengthInS;
+    switch(eParam){
+        case kParamGain:
+            return m_fGainValue;
+        case kParamDelay:
+            return m_fMaxDelayLengthInS;
+        default:
+            return 0.0f;
     }
-    else{
-        return 0.0f;
-    }
+
 }

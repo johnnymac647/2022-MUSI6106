@@ -5,7 +5,8 @@
 //  Created by JOHN MCNAMARA on 2/12/22.
 //
 
-#include "CombFilter.hpp"
+#include "CombFilter.h"
+#include "RingBuffer.h"
 
 //constructors for CCombFilterBase, CFIRFilter, CIIRFilter
 //CCombFilterBase::CCombFilterBase () :
@@ -28,9 +29,8 @@ Error_t CFIRFilter::process(**ppfInputBuffer, **ppfOutputBuffer, iNumberOfFrames
     int i_DelaySamples = m_iMaxDelayLengthInSamples;
     int i_curReadIdx = ppfInputBuffer.getReadIdx();
     int i_delayedReadIdx = i_curReadIdx - i_DelaySamples;
+    
 
-    
-    
     ppfInputBuffer.setReadIdx(i_delayedReadIdx);
     float f_delayedValue = ppfInputBuffer.get();
     ppfInputBuffer.setReadIdx(i_curReadIdx);

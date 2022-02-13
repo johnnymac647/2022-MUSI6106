@@ -7,6 +7,7 @@
 #include "RingBuffer.h"
 #include "AudioFileIf.h"
 #include "CombFilterIf.h"
+#include "CombFilter.hpp"
 
 using std::cout;
 using std::endl;
@@ -18,6 +19,7 @@ void    showClInfo ();
 // main function
 int main(int argc, char* argv[])
 {
+    showClInfo();
     std::string sInputFilePath,                 //!< file paths
                 sOutputFilePath;
 
@@ -39,7 +41,7 @@ int main(int argc, char* argv[])
     if (argc < 2)
     {
         cout << "Testing Comb Filter Implementation\n";
-        
+
         cout << "Test 1: FIR: Output is zero if input freq matches feedforward\n";
         //TODO: Implement Test 1
         cout << "Test 2: IIR: amount of magnitude increase/decrease if input freq matches feedback\n";
@@ -50,7 +52,7 @@ int main(int argc, char* argv[])
         //TODO: Implement Test 4
         cout << "Test 5 One more additional MEANINGFUL test to verify your filter implementation\n";
         //TODO: Implement Test 5
-        
+
         return -1;
     }
     else if (argc < 5)
@@ -61,12 +63,12 @@ int main(int argc, char* argv[])
     else
     {
         sInputFilePath = argv[1];
-        sOutputFilePath = sInputFilePath + ".txt";
-        
-        CCombFilterIf::CombFilterType_t eFilterType = argv[2];
-        float f_gainValue = argv[3];
-        float f_delayValue = argv[4];
-        
+        sOutputFilePath = sInputFilePath + "_delayed.txt";
+
+        CCombFilterIf::CombFilterType_t eFilterType = static_cast<CCombFilter::CombFilterType_t>(argv[2]);
+        float f_gainValue = static_cast<float>(argv[3]);
+        float f_delayValue = static_cast<float>(argv[4]);
+
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -80,7 +82,7 @@ int main(int argc, char* argv[])
         return -1;
     }
     phAudioFile->getFileSpec(stFileSpec);
-    
+
     //create and initialize the comb filter
     CCombFilterIf::create(phCombFilter);
     phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
@@ -134,6 +136,7 @@ int main(int argc, char* argv[])
         {
             for (int c = 0; c < stFileSpec.iNumChannels; c++)
             {
+                
                 
 //                hOutputFile << ppfAudioData[c][i] << "\t";
             }
