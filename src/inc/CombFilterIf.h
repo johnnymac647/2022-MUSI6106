@@ -2,6 +2,8 @@
 #define __CombFilterIf_hdr__
 
 #include "ErrorDef.h"
+#include <map>
+#include <string>
 
 class CCombFilterBase; // in case you intend to add an internal base class that the user doesn't see (not required)
 
@@ -98,7 +100,10 @@ public:
 
 protected:
     CCombFilterIf ();
-    virtual ~CCombFilterIf ();
+    virtual ~CCombFilterIf (){
+        delete m_pCCombFilter;
+        this->reset();
+    };
     
     CombFilterType_t m_eFilterType;
     float           m_fMaxDelayLengthInS;

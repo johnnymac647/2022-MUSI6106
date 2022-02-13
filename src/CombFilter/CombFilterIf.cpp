@@ -26,12 +26,6 @@ CCombFilterIf::CCombFilterIf () :
     this->reset ();
 }
 
-
-CCombFilterIf::~CCombFilterIf ()
-{
-    this->reset ();
-}
-
 const int  CCombFilterIf::getVersion (const Version_t eVersionIdx)
 {
     int iVersion = 0;
@@ -77,28 +71,20 @@ Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
 Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
     
-    //Initialize new space of either FIR or IIR depending on the filter type passed into the initialization
-    switch(m_eFilterType){
-        case kCombFIR:
-            m_pCCombFilter = new CFIRFilter();
-        case kCombIIR:
-            m_pCCombFilter = new CIIRFilter();
-        default:
-            m_pCCombFilter = new CFIRFilter();
-    }
+
 
     m_eFilterType = eFilterType;
     m_fSampleRate = fSampleRateInHz;
     setParam(kParamDelay, fMaxDelayLengthInS);
     m_iNumChannels = iNumChannels;
 
-    m_pCCombFilter = new CCombFilterBase(eFilterType, iNumChannels, m_iMaxDelayLengthInSamples, m_fGainValue)
+    m_pCCombFilter = new CCombFilterBase(m_iNumChannels);
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::reset ()
 {
-    init(m_eFilterType, 1.0, 44100, 1)
+    init(m_eFilterType, 1.0, 44100, 1);
     return Error_t::kNoError;
 }
 

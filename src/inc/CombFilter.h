@@ -19,14 +19,11 @@
 
 class CCombFilterBase : CCombFilterIf{
 public:
-    CCombFilterBase(CombFilterType_t e_filterType, int iNumberOfChannels, int iDelaySamples, float fGain){
-        m_e_filterType = e_filterType;
+    explicit CCombFilterBase(int iNumberOfChannels){
         m_iNumberOfChannels = iNumberOfChannels;
-        m_iDelaySamples = iDelaySamples;
-        m_fGain = fGain;
 
         m_iBufferSize = setBufferSize();
-        m_rbDelayLine = new CRingBuffer<float>(m_iBufferSize);
+        m_pRBDelayLine = new CRingBuffer<float>(m_iBufferSize);
     }
     //setting delay or gain
     //taking the block size
@@ -34,13 +31,11 @@ public:
     
 
     
-    virtual Error_t process(float **ppfInput, float **ppfOutput, int iNumFrames) = 0;
+    Error_t process(float **ppfInput, float **ppfOutput, int iNumFrames);
 
     int setBufferSize(){
         int count = 0;
-        int n = m_iDelaySamples;
-        if (n && !(n & (n - 1)))
-            return n;
+        int n = m_iMaxDelayLengthInSamples;
         while (n != 0){
             n = n>>1;
             count = count + 1;
@@ -49,39 +44,14 @@ public:
     }
     
 protected:
-    CCombFilterBase();
-    virtual ~CCombFilterBase();
-
-    CCombFilterIf::CombFilterType_t m_e_filterType;
+//    virtual ~CCombFilterBase();
     int m_iNumberOfChannels;
-    int m_iDelaySamples;
-    float m_fGain;
     //define buffer variable here - has to be like the read audio
     int m_iBufferSize;
-    CRingBuffer<float> m_rbDelayLine;
+    CRingBuffer<float>* m_pRBDelayLine= 0;
 
     
 };
-
-//Initialize new space of either FIR or IIR depending on what type
-class CFIRFilter : CCombFilterBase{
-public:
-    CFIRFilter();
-    Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) override;
-
-protected:
-    virtual ~CFIRFilter();
-};
-
-class CIIRFilter : CCombFilterBase{
-public:
-    CIIRFilter();
-    Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) override;
-
-protected:
-    virtual ~CIIRFilter();
-};
-
 
 #endif /* CombFilter_hpp */
 
