@@ -88,9 +88,11 @@ Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLength
     }
 
     m_eFilterType = eFilterType;
-    setParam(kParamDelay, fMaxDelayLengthInS);
     m_fSampleRate = fSampleRateInHz;
+    setParam(kParamDelay, fMaxDelayLengthInS);
     m_iNumChannels = iNumChannels;
+
+    m_pCCombFilter = new CCombFilterBase(eFilterType, iNumChannels, m_iMaxDelayLengthInSamples, m_fGainValue)
     return Error_t::kNoError;
 }
 
@@ -102,7 +104,7 @@ Error_t CCombFilterIf::reset ()
 
 Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
 {
-    return m_pCCombFilter->process(**ppfInputBuffer, **ppfOutputBuffer, iNumberOfFrames);
+    return m_pCCombFilter->process(ppfInputBuffer, ppfOutputBuffer, iNumberOfFrames);
 }
 
 Error_t CCombFilterIf::setParam (FilterParam_t eParam, float fParamValue)

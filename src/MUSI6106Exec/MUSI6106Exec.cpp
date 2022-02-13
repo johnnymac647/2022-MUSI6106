@@ -7,7 +7,7 @@
 #include "RingBuffer.h"
 #include "AudioFileIf.h"
 #include "CombFilterIf.h"
-#include "CombFilter.hpp"
+#include "CombFilter.h"
 
 using std::cout;
 using std::endl;
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     float **ppfAudioData = 0;
 
     CAudioFileIf *phAudioFile = 0;
-    CCombFilter *phCombFilter = 0;
+    CCombFilterBase *phCombFilter = 0;
     std::fstream hOutputFile;
     CAudioFileIf::FileSpec_t stFileSpec;
 
