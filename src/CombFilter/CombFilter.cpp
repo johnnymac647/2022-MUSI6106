@@ -28,13 +28,13 @@ Error_t CCombFilterBase::process(float **ppfInputBuffer, float **ppfOutputBuffer
         {
             float fCurVal = ppfInputBuffer[c][i];
             float fDelayVal = m_pRBDelayLine->getPostInc();
-            float fCombinedVal = fCurVal + m_fGainValue*fDelayVal;
+            float fCombinedVal = fCurVal + m_fGain*fDelayVal;
             ppfOutputBuffer[c][i] = fCombinedVal;
-            switch(m_eFilterType){
-                case CCombFilterIf::kCombFIR:
+            switch(m_iFilterType){
+                case 0:
                     m_pRBDelayLine->putPostInc(fCurVal);
                     break;
-                case CCombFilterIf::kCombIIR:
+                case 1:
                     m_pRBDelayLine->putPostInc(fCombinedVal);
                 default:
                     m_pRBDelayLine->putPostInc(fCurVal);

@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     else
     {
         sInputFilePath = argv[1];
-        sOutputFilePath = sInputFilePath + "_delayed.wav";
+        sOutputFilePath = sInputFilePath.substr(0, sInputFilePath.size()-4) + "_delayed.wav";
         if(argv[2] == "FIR"){
             eFilterType = CCombFilterIf::kCombFIR;
         } else if (argv[2] == "IIR"){
@@ -104,13 +104,6 @@ int main(int argc, char* argv[])
     }
     phInputAudioFile->getFileSpec(stFileSpec);
 
-    //create the output wave file
-//    std::ifstream  src(sInputFilePath, std::ios::binary);
-//    std::ofstream  dst(sOutputFilePath,   std::ios::binary);
-//    dst << src.rdbuf();
-    std::ofstream outputFile(sOutputFilePath);
-    outputFile.close();
-    cout << "Successfully created output file!\n";
     CAudioFileIf::create(phOutputAudioFile);
     phOutputAudioFile->openFile(sOutputFilePath, CAudioFileIf::kFileWrite);
     if (!phOutputAudioFile->isOpen())
@@ -119,16 +112,14 @@ int main(int argc, char* argv[])
         CAudioFileIf::destroy(phOutputAudioFile);
         return -1;
     }
-
     else{
         cout << "Successfully opened output file!\n";
     }
 
     //create and initialize the comb filter
     CCombFilterIf::create(phCombFilter);
-//    phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
-//    phCombFilter->setParam(CCombFilterIf::kParamGain, f_gainValue);
-    cout << "Successfully created comb filter!\n";
+    phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+    phCombFilter->setParam(CCombFilterIf::kParamGain, f_gainValue);
 
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
@@ -154,30 +145,19 @@ int main(int argc, char* argv[])
     }
 
     time = clock();
-
-    //////////////////////////////////////////////////////////////////////////////
-    // get audio data and write it to the output text file (one column per channel)
+//
+//    //////////////////////////////////////////////////////////////////////////////
+//    // get audio data and write it to the output text file (one column per channel)
     while (!phInputAudioFile->isEof())
     {
         // set block length variable
         long long iNumFrames = kBlockSize;
-
         // read data (iNumOfFrames might be updated!)
         phInputAudioFile->readData(ppfInputAudioData, iNumFrames);
-
         cout << "\r" << "reading and writing";
+        phCombFilter->process(ppfInputAudioData, ppfOutputAudioData, iNumFrames);
+        phOutputAudioFile->writeData(ppfInputAudioData, iNumFrames);
 
-        // write
-        for (int i = 0; i < iNumFrames; i++)
-        {
-            for (int c = 0; c < stFileSpec.iNumChannels; c++)
-            {
-                phCombFilter->process(ppfInputAudioData, ppfOutputAudioData, iNumFrames);
-//                hOutputFile << ppfInputAudioData[c][i] << "\t";
-            }
-//            hOutputFile << endl;
-        }
-        phOutputAudioFile->writeData(ppfOutputAudioData,iNumFrames);
     }
 
     cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;
@@ -196,6 +176,8 @@ int main(int argc, char* argv[])
     delete[] ppfOutputAudioData;
     ppfInputAudioData = 0;
     ppfOutputAudioData = 0;
+    phInputAudioFile = 0;
+    phOutputAudioFile = 0;
     phCombFilter = 0;
 
     // all done
