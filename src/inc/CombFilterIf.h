@@ -6,42 +6,8 @@
 #include <map>
 #include <string>
 
-class CCombFilterBase {
-public:
-    explicit CCombFilterBase(int iNumberOfChannels, int iDelaySamples, float fGain, int iFilterType){
-        m_iNumberOfChannels = iNumberOfChannels;
-        m_iMaxDelayLengthInSamples = iDelaySamples;
-        m_iBufferSize = setBufferSize();
-        m_pRBDelayLine = new CRingBuffer<float>(m_iBufferSize);
-        m_fGain = fGain;
-        m_iFilterType = iFilterType;
-    }
+class CCombFilterBase; // in case you intend to add an internal base class that the user doesn't see (not required)
 
-//    Error_t init(int iNumberOfChannels);
-
-    Error_t process(float **ppfInput, float **ppfOutput, int iNumFrames);
-
-    int setBufferSize(){
-        int count = 0;
-        int n = m_iMaxDelayLengthInSamples;
-        while (n != 0){
-            n = n>>1;
-            count = count + 1;
-        }
-        return 1 << count;
-    }
-
-protected:
-//    virtual ~CCombFilterBase();
-    int m_iNumberOfChannels;
-    int m_iMaxDelayLengthInSamples;
-    int m_iBufferSize;
-    CRingBuffer<float>* m_pRBDelayLine= 0;
-    float m_fGain;
-    int m_iFilterType; //0 for FIR, 1 for IIR
-
-
-};
 
 /*! \brief interface class for the comb filter (FIR & IIR)
 */
