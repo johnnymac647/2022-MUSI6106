@@ -18,26 +18,27 @@
 
 
 Error_t CCombFilterBase::process(float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames){
-    int iStartingReadIdx = m_pRBDelayLine->getReadIdx();
-    m_pRBDelayLine->setWriteIdx(iStartingReadIdx + m_iMaxDelayLengthInSamples);
+
 
     for (int c = 0; c < m_iNumberOfChannels; c++)
     {
-        m_pRBDelayLine->reset();
+//        int iStartingReadIdx = m_pRBDelayLine[c]->getReadIdx();
+//        m_pRBDelayLine[c]->setWriteIdx(iStartingReadIdx + m_iMaxDelayLengthInSamples);
+        m_pRBDelayLine[c]->reset();
         for (int i = 0; i < iNumberOfFrames; i++)
         {
             float fCurVal = ppfInputBuffer[c][i];
-            float fDelayVal = m_pRBDelayLine->getPostInc();
+            float fDelayVal = m_pRBDelayLine[c]->getPostInc();
             float fCombinedVal = fCurVal + m_fGain*fDelayVal;
             ppfOutputBuffer[c][i] = fCombinedVal;
             switch(m_iFilterType){
                 case 0:
-                    m_pRBDelayLine->putPostInc(fCurVal);
+                    m_pRBDelayLine[c]->putPostInc(fCurVal);
                     break;
                 case 1:
-                    m_pRBDelayLine->putPostInc(fCombinedVal);
+                    m_pRBDelayLine[c]->putPostInc(fCombinedVal);
                 default:
-                    m_pRBDelayLine->putPostInc(fCurVal);
+                    m_pRBDelayLine[c]->putPostInc(fCurVal);
             }
         }
     }

@@ -160,6 +160,9 @@ int main(int argc, char* argv[])
 
         cout << "Test 1: FIR: Output is zero if input freq matches feedforward\n";
         //TODO: Implement Test 1
+        sInputFilePath = "../../testAudio/";
+        int test1 = applyCombFilter(phInputAudioFile, phOutputAudioFile, phCombFilter, sInputFilePath, sOutputFilePath,
+                                    ppfInputAudioData, ppfOutputAudioData, stFileSpec, f_gainValue, f_delayValue, eFilterType, kBlockSize);
         cout << "Test 2: IIR: amount of magnitude increase/decrease if input freq matches feedback\n";
         //TODO: Implement Test 2
         cout << "Test 3: FIR/IIR: correct result for VARYING input block size\n";

@@ -22,12 +22,18 @@ public:
         m_iNumberOfChannels = iNumberOfChannels;
         m_iMaxDelayLengthInSamples = iDelaySamples;
         m_iBufferSize = setBufferSize();
-        m_pRBDelayLine = new CRingBuffer<float>(m_iBufferSize);
+        m_pRBDelayLine = new CRingBuffer<float>* [iNumberOfChannels];
+
+        for (int i = 0; i < m_iNumberOfChannels; i++){
+            m_pRBDelayLine[i] = new CRingBuffer<float>(m_iBufferSize);
+        }
+
         m_fGain = fGain;
         m_iFilterType = iFilterType;
     }
 
 //    Error_t init(int iNumberOfChannels);
+    virtual ~CCombFilterBase();
 
     Error_t process(float **ppfInput, float **ppfOutput, int iNumFrames);
 
@@ -46,7 +52,7 @@ protected:
     int m_iNumberOfChannels;
     int m_iMaxDelayLengthInSamples;
     int m_iBufferSize;
-    CRingBuffer<float>* m_pRBDelayLine= 0;
+    CRingBuffer<float> **m_pRBDelayLine= 0;
     float m_fGain;
     int m_iFilterType; //0 for FIR, 1 for IIR
 
