@@ -64,10 +64,10 @@ int main(int argc, char* argv[])
         //TODO: Implement Test 3
         cout << "Test 4: FIR/IIR: correct processing for zero input signal\n";
         //TODO: Implement "Test 4
-        *argv = ["./MUSI6106EXEC", "../../testAudio/0_test.wav","FIR", "0.05", "0.5"];
-        int test4a = main(5, *argv);
-        *argv = ["./MUSI6106EXEC", "../../testAudio/0_test.wav","IIR", "0.05", "0.5"];
-        int test4b = main(5, *argv);
+//        *argv = ["./MUSI6106EXEC", "../../testAudio/0_test.wav","FIR", "0.05", "0.5"];
+//        int test4a = main(5, *argv);
+//        *argv = ["./MUSI6106EXEC", "../../testAudio/0_test.wav","IIR", "0.05", "0.5"];
+//        int test4b = main(5, *argv);
         cout << "Test 5 One more additional MEANINGFUL test to verify your filter implementation\n";
         //TODO: Implement Test 5
 
