@@ -64,7 +64,15 @@ public:
     */
     T get() const
     {
-        return m_ptBuff[m_iReadIdx];
+//        return m_ptBuff[m_iReadIdx];
+        int i_floor = floor(m_fReadIdx);
+        incIdx(i_floor, 0);
+        int i_ceil = ceil(m_fReadIdx);
+        float f_between = i_ceil - m_fReadIdx;
+        incIdx(i_ceil, 0);
+        float f_interp = f_between*m_ptBuff[i_floor] + (1-f_between)*m_ptBuff[i_ceil];
+        return f_interp;
+
     }
 
     /*! set buffer content and indices to 0
@@ -143,6 +151,8 @@ private:
     int m_iBuffLength,      //!< length of the internal buffer
         m_iReadIdx,         //!< current read index
         m_iWriteIdx;        //!< current write index
+
+    float m_fReadIdx;       //!< allow the read index to be a float. Return the interpolation between adjacent values
 
     T* m_ptBuff;            //!< data buffer
 };
