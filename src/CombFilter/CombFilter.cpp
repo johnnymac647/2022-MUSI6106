@@ -1,26 +1,26 @@
-//
-//  CombFilter.cpp
-//  CombFilter
-//
-//  Created by JOHN MCNAMARA on 2/12/22.
-//
-
 #include "CombFilter.h"
 #include "RingBuffer.h"
 
-//constructors for CCombFilterBase, CFIRFilter, CIIRFilter
-//CCombFilterBase::CCombFilterBase () :
-//    //create the buffer here
-//
-//{
-//    this->reset();
-//}
+CCombFilterBase::CCombFilterBase(){
+    m_iBufferSize = setBufferSize();
+    m_pRBDelayLine = new CRingBuffer<float>*[m_iNumChannels];
+    for (int c = 0; c < m_iNumChannels; c++){
+        m_pRBDelayLine[c] = new CRingBuffer<float>(m_iBufferSize);
+    }
+}
 
+CCombFilterBase::~CCombFilterBase(){
+    for (int c = 0; c < m_iNumChannels; c++){
+        delete m_pRBDelayLine[c];
+    }
+    delete m_pRBDelayLine;
+    m_pRBDelayLine = 0;
+}
 
 Error_t CCombFilterBase::process(float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames){
 
 
-    for (int c = 0; c < m_iNumberOfChannels; c++)
+    for (int c = 0; c < m_iNumChannels; c++)
     {
 //        int iStartingReadIdx = m_pRBDelayLine[c]->getReadIdx();
 //        m_pRBDelayLine[c]->setWriteIdx(iStartingReadIdx + m_iMaxDelayLengthInSamples);
@@ -29,16 +29,14 @@ Error_t CCombFilterBase::process(float **ppfInputBuffer, float **ppfOutputBuffer
         {
             float fCurVal = ppfInputBuffer[c][i];
             float fDelayVal = m_pRBDelayLine[c]->getPostInc();
-            float fCombinedVal = fCurVal + m_fGain*fDelayVal;
+            float fCombinedVal = fCurVal + m_fGainValue*fDelayVal;
             ppfOutputBuffer[c][i] = fCombinedVal;
-            switch(m_iFilterType){
-                case 0:
-                    m_pRBDelayLine[c]->putPostInc(fCurVal);
-                    break;
-                case 1:
-                    m_pRBDelayLine[c]->putPostInc(fCombinedVal);
-                default:
-                    m_pRBDelayLine[c]->putPostInc(fCurVal);
+            if(m_eFilterType == kCombFIR){
+                m_pRBDelayLine[c]->putPostInc(fCurVal);
+            }else if (m_eFilterType == kCombIIR){
+                m_pRBDelayLine[c]->putPostInc(fCombinedVal);
+            }else{
+                m_pRBDelayLine[c]->putPostInc(fCurVal);
             }
         }
     }

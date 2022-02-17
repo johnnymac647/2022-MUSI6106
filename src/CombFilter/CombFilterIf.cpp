@@ -20,7 +20,10 @@ static const char*  kCMyProjectBuildDate = __DATE__;
 CCombFilterIf::CCombFilterIf () :
     m_bIsInitialized(false),
     m_pCCombFilter(0),
-    m_fSampleRate(44100)
+    m_fSampleRate(44100),
+    m_fGainValue(0),
+    m_fMaxDelayLengthInS(0)
+
 {
     // this should never hurt
     this->reset ();
@@ -70,24 +73,12 @@ Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
 
 Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
-
     m_eFilterType = eFilterType;
     m_fSampleRate = fSampleRateInHz;
     setParam(kParamDelay, fMaxDelayLengthInS);
     m_iNumChannels = iNumChannels;
-    int iFilter;
-    switch (m_eFilterType) {
-        case kCombFIR:
-            iFilter = 0;
-            break;
-        case kCombIIR:
-            iFilter = 1;
-            break;
-        default:
-            iFilter = 0;
-    }
-
-    m_pCCombFilter = new CCombFilterBase(m_iNumChannels, m_iMaxDelayLengthInSamples, m_fGainValue, iFilter);
+    m_bIsInitalized = true;
+//    m_pCCombFilter = new CCombFilterBase(m_iNumChannels, m_iMaxDelayLengthInSamples, m_fGainValue);
     return Error_t::kNoError;
 }
 
@@ -95,6 +86,7 @@ Error_t CCombFilterIf::reset ()
 {
     init(m_eFilterType, 1.0, 44100, 1);
     return Error_t::kNoError;
+    m_bIsInitialized = false;
 }
 
 Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)

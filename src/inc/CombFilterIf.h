@@ -102,10 +102,7 @@ public:
 
 protected:
     CCombFilterIf ();
-    virtual ~CCombFilterIf (){
-        delete m_pCCombFilter;
-        this->reset();
-    };
+    virtual ~CCombFilterIf ();
     
     CombFilterType_t m_eFilterType;
     float           m_fMaxDelayLengthInS;
