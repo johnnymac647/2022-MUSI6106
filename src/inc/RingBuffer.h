@@ -62,17 +62,30 @@ public:
     /*! return the value at the current read index
     \return float the value from the read index
     */
-    T get() const
+    T get(float fOffset = 0) const
     {
 //        return m_ptBuff[m_iReadIdx];
-        int i_floor = floor(m_fReadIdx);
+        float f_between, fIdx;
+        f_between = modf(fOffset, &fIdx);
+        int i_floor = static_cast<int>(fIdx);
+        int i_ceil = i_floor + 1;
+
         incIdx(i_floor, 0);
-        int i_ceil = ceil(m_fReadIdx);
-        float f_between = i_ceil - m_fReadIdx;
         incIdx(i_ceil, 0);
-        float f_interp = f_between*m_ptBuff[i_floor] + (1-f_between)*m_ptBuff[i_ceil];
+
+        float f_interp = (1-f_between)*m_ptBuff[i_floor] + f_between*m_ptBuff[i_ceil];
         return f_interp;
 
+    }
+
+    void testFloatGet(){
+        //create test index values
+        float testIndicies[] = {-1000.23, 0.0, 5.0,2.4, 2.41, 12347890.1234};
+        int arrSize = *(&testIndicies + 1) - testIndicies;
+        for( int i = 0; i < arrSize; i++){
+            std::cout << "Value at of the Ring Buffer at index " << testIndicies[i] << " is " << get(testIndicies[i]);
+//            std::cout <<
+        }
     }
 
     /*! set buffer content and indices to 0
