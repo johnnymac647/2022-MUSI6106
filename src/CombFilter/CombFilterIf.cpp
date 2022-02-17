@@ -22,11 +22,15 @@ CCombFilterIf::CCombFilterIf () :
     m_pCCombFilter(0),
     m_fSampleRate(44100),
     m_fGainValue(0),
-    m_fMaxDelayLengthInS(0)
+    m_fMaxDelayLengthInSec(0)
 
 {
     // this should never hurt
     this->reset ();
+}
+
+CCombFilterIf::~CCombFilterIf() {
+    this->reset();
 }
 
 const int  CCombFilterIf::getVersion (const Version_t eVersionIdx)
@@ -71,22 +75,24 @@ Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
     return Error_t::kNoError;
 }
 
-Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
+Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInSec, float fSampleRateInHz, int iNumChannels)
 {
-    m_eFilterType = eFilterType;
+    m_bIsInitialized = true;
+    m_pCCombFilter = new CCombFilterBase(eFilterType, fMaxDelayLengthInSec, fSampleRateInHz, iNumChannels);
     m_fSampleRate = fSampleRateInHz;
-    setParam(kParamDelay, fMaxDelayLengthInS);
-    m_iNumChannels = iNumChannels;
-    m_bIsInitalized = true;
-//    m_pCCombFilter = new CCombFilterBase(m_iNumChannels, m_iMaxDelayLengthInSamples, m_fGainValue);
+
+    
+    setParam(kParamDelay, fMaxDelayLengthInSec);
+
+    
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::reset ()
 {
-    init(m_eFilterType, 1.0, 44100, 1);
-    return Error_t::kNoError;
+    init(kCombFIR, 1.0, 44100, 1);
     m_bIsInitialized = false;
+    return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
@@ -96,29 +102,11 @@ Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer,
 
 Error_t CCombFilterIf::setParam (FilterParam_t eParam, float fParamValue)
 {
-    switch(eParam){
-        case kParamGain:
-            m_fGainValue = fParamValue;
-            return Error_t::kNoError;
-        case kParamDelay:
-            m_fMaxDelayLengthInS = fParamValue;
-            m_iMaxDelayLengthInSamples = static_cast<int>(m_fMaxDelayLengthInS * m_fSampleRate);
-            return Error_t::kNoError;
-        default:
-            return Error_t::kFunctionInvalidArgsError;
-    }
+    return m_pCCombFilter->setParam(eParam, fParamValue);
 
 }
 
 float CCombFilterIf::getParam (FilterParam_t eParam) const
 {
-    switch(eParam){
-        case kParamGain:
-            return m_fGainValue;
-        case kParamDelay:
-            return m_fMaxDelayLengthInS;
-        default:
-            return 0.0f;
-    }
-
+    return m_pCCombFilter->getParam(eParam);
 }

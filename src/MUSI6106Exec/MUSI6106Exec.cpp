@@ -7,7 +7,7 @@
 
 #include "RingBuffer.h"
 #include "AudioFileIf.h"
-#include "CombFilterIf.h"
+//#include "CombFilterIf.h"
 #include "CombFilter.h"
 
 using std::strtof;
@@ -15,7 +15,7 @@ using std::cout;
 using std::endl;
 
 
-int applyCombFilter(CAudioFileIf *phInputAudioFile, CAudioFileIf *phOutputAudioFile, CCombFilterIf *phCombFilter,
+int applyCombFilter(CAudioFileIf *phInputAudioFile,CAudioFileIf *phOutputAudioFile, CCombFilterIf *phCombFilter,
                     std::string sInputFilePath, std::string sOutputFilePath,
                     float **ppfInputAudioData, float **ppfOutputAudioData, CAudioFileIf::FileSpec_t stFileSpec,
                     float f_gainValue,  float f_delayValue, CCombFilterIf::CombFilterType_t eFilterType, int kBlockSize){
@@ -49,6 +49,8 @@ int applyCombFilter(CAudioFileIf *phInputAudioFile, CAudioFileIf *phOutputAudioF
     CCombFilterIf::create(phCombFilter);
     phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
     phCombFilter->setParam(CCombFilterIf::kParamGain, f_gainValue);
+
+
 
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
@@ -187,9 +189,10 @@ int main(int argc, char* argv[])
     {
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath.substr(0, sInputFilePath.size()-4) + "_delayed.wav";
-        if(argv[2] == "FIR"){
+        std::string filter = argv[2];
+        if(filter == "FIR"){
             eFilterType = CCombFilterIf::kCombFIR;
-        } else if (argv[2] == "IIR"){
+        } else if (filter == "IIR"){
             eFilterType = CCombFilterIf::kCombIIR;
         } else{
             cout << "An invalid argument was passed for the filter type. Valid options include \"FIR\" and \"IIR\".  ";

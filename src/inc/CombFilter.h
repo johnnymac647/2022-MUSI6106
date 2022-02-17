@@ -27,7 +27,7 @@ public:
 //    }
 
 //    Error_t init(int iNumberOfChannels);
-    CCombFilterBase();
+    CCombFilterBase(CombFilterType_t eFilterType, float fMaxDelayS, float fSampleRate, int iNumChannels);
     virtual ~CCombFilterBase();
 
     Error_t process(float **ppfInput, float **ppfOutput, int iNumFrames);
@@ -42,6 +42,22 @@ public:
         }
         return 1 << count;
     }
+    
+    Error_t init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels);
+    
+    
+    /*! sets a comb filter parameter
+    \param eParam what parameter (see ::FilterParam_t)
+    \param fParamValue value of the parameter
+    \return Error_t
+    */
+    Error_t setParam (FilterParam_t eParam, float fParamValue);
+    
+    /*! return the value of the specified parameter
+    \param eParam
+    \return float
+    */
+    float   getParam (FilterParam_t eParam) const;
 
 protected:
 //    virtual ~CCombFilterBase();
@@ -49,6 +65,13 @@ protected:
 //    int m_iMaxDelayLengthInSamples;
     int m_iBufferSize;
     CRingBuffer<float> **m_pRBDelayLine= 0;
+    CombFilterType_t m_eFilterType;
+    float           m_fSampleRate;
+    float           m_fMaxDelayLengthInS;
+    int             m_iMaxDelayLengthInSamples;
+    int             m_iCurDelayInSamples;
+    float           m_fGainValue;
+    int             m_iNumChannels;
 //    float m_fGain;
 //    int m_iFilterType; //0 for FIR, 1 for IIR
 

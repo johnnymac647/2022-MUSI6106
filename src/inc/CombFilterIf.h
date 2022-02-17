@@ -103,13 +103,10 @@ public:
 protected:
     CCombFilterIf ();
     virtual ~CCombFilterIf ();
-    
-    CombFilterType_t m_eFilterType;
-    float           m_fMaxDelayLengthInS;
-    int             m_iMaxDelayLengthInSamples;
-    float           m_fGainValue;
-    int             m_iNumChannels;
 
+    float m_fGainValue;
+    float m_fMaxDelayLengthInSec;
+    
 private:
     bool            m_bIsInitialized;   //!< internal bool to check whether the init function has been called
     CCombFilterBase *m_pCCombFilter;    //!< handle of the comb filter
