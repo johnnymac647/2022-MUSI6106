@@ -14,12 +14,17 @@ using std::strtof;
 using std::cout;
 using std::endl;
 
-
-int applyCombFilter(CAudioFileIf *phInputAudioFile,CAudioFileIf *phOutputAudioFile, CCombFilterIf *phCombFilter,
-                    std::string sInputFilePath, std::string sOutputFilePath,
-                    float **ppfInputAudioData, float **ppfOutputAudioData, CAudioFileIf::FileSpec_t stFileSpec,
-                    float f_gainValue,  float f_delayValue, CCombFilterIf::CombFilterType_t eFilterType, int kBlockSize){
+//function that reads input Audio and applies the combfilter
+//abstracted from main to make it easier to use in the test cases
+int applyCombFilter(std::string sInputFilePath, std::string sOutputFilePath,
+                    float f_gainValue,  float f_delayValue, CCombFilterIf::CombFilterType_t eFilterType,
+                    int kBlockSize, bool bVaryingBlock = false){
     // open the input wave file
+    CAudioFileIf *phInputAudioFile = 0;
+    CAudioFileIf *phOutputAudioFile = 0;
+    CCombFilterIf *phCombFilter = 0;
+    
+    
     CAudioFileIf::create(phInputAudioFile);
     phInputAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
     if (!phInputAudioFile->isOpen())
@@ -31,6 +36,7 @@ int applyCombFilter(CAudioFileIf *phInputAudioFile,CAudioFileIf *phOutputAudioFi
     else{
         cout << "Successfully opened input file!\n";
     }
+    CAudioFileIf::FileSpec_t stFileSpec;
     phInputAudioFile->getFileSpec(stFileSpec);
 
     CAudioFileIf::create(phOutputAudioFile);
@@ -50,12 +56,10 @@ int applyCombFilter(CAudioFileIf *phInputAudioFile,CAudioFileIf *phOutputAudioFi
     phCombFilter->init(eFilterType, f_delayValue, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
     phCombFilter->setParam(CCombFilterIf::kParamGain, f_gainValue);
 
-
-
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
-    ppfInputAudioData = new float*[stFileSpec.iNumChannels];
-    ppfOutputAudioData = new float*[stFileSpec.iNumChannels];
+    float **ppfInputAudioData = new float*[stFileSpec.iNumChannels];
+    float **ppfOutputAudioData = new float*[stFileSpec.iNumChannels];
 
     for (int i = 0; i < stFileSpec.iNumChannels; i++){
         ppfInputAudioData[i] = new float[kBlockSize];
@@ -87,7 +91,10 @@ int applyCombFilter(CAudioFileIf *phInputAudioFile,CAudioFileIf *phOutputAudioFi
         phInputAudioFile->readData(ppfInputAudioData, iNumFrames);
         cout << "\r" << "reading and writing";
         phCombFilter->process(ppfInputAudioData, ppfOutputAudioData, iNumFrames);
-        phOutputAudioFile->writeData(ppfInputAudioData, iNumFrames);
+        phOutputAudioFile->writeData(ppfOutputAudioData, iNumFrames);
+        if(bVaryingBlock){
+            iNumFrames++;
+        }
 
     }
 
@@ -115,15 +122,8 @@ int applyCombFilter(CAudioFileIf *phInputAudioFile,CAudioFileIf *phOutputAudioFi
 }
 
 
-
-
-
 // local function declarations
 void    showClInfo ();
-
-//function that reads input Audio and applies the combfilter
-//abstracted from main to make it easier to use in the test cases
-
 
 /////////////////////////////////////////////////////////////////////////////////
 // main function
@@ -134,23 +134,11 @@ int main(int argc, char* argv[])
                 sOutputFilePath;
 
     static int kBlockSize = 1024;
-
     clock_t time = 0;
-
-    float **ppfInputAudioData = 0;
-    float **ppfOutputAudioData = 0;
-
-    CAudioFileIf *phInputAudioFile = 0;
-    CAudioFileIf *phOutputAudioFile = 0;
-    CCombFilterIf *phCombFilter = 0;
-    std::fstream hOutputFile;
-    CAudioFileIf::FileSpec_t stFileSpec;
-
     showClInfo();
 
     //relevant variable names for initializing the combfilter:
     CCombFilterIf::CombFilterType_t eFilterType;
-
     float f_gainValue;
     float f_delayValue;
 
@@ -159,24 +147,35 @@ int main(int argc, char* argv[])
     if (argc < 2)
     {
         cout << "Testing Comb Filter Implementation\n";
-
         cout << "Test 1: FIR: Output is zero if input freq matches feedforward\n";
-        //TODO: Implement Test 1
-        sInputFilePath = "../../testAudio/";
-        int test1 = applyCombFilter(phInputAudioFile, phOutputAudioFile, phCombFilter, sInputFilePath, sOutputFilePath,
-                                    ppfInputAudioData, ppfOutputAudioData, stFileSpec, f_gainValue, f_delayValue, eFilterType, kBlockSize);
+        sInputFilePath = "../../testAudio/200_test.wav";
+        sOutputFilePath = "test1_results.wav";
+        int test1 = applyCombFilter(sInputFilePath, sOutputFilePath, 0.5, 0.0025, CCombFilterIf::kCombFIR, kBlockSize);
+        
         cout << "Test 2: IIR: amount of magnitude increase/decrease if input freq matches feedback\n";
-        //TODO: Implement Test 2
+        sOutputFilePath = "test2_results.wav";
+        int test2 = applyCombFilter(sInputFilePath, sOutputFilePath, 0.5, 0.005, CCombFilterIf::kCombIIR, kBlockSize);
+        
         cout << "Test 3: FIR/IIR: correct result for VARYING input block size\n";
-        //TODO: Implement Test 3
+        sOutputFilePath = "test3a_results.wav";
+        int test3a = applyCombFilter(sInputFilePath, sOutputFilePath, 0.5, 0.005, CCombFilterIf::kCombFIR, kBlockSize, true);
+        sOutputFilePath = "test3b_results.wav";
+        int test3b = applyCombFilter(sInputFilePath, sOutputFilePath, 0.5, 0.005, CCombFilterIf::kCombIIR, kBlockSize, true);
+        
+        
         cout << "Test 4: FIR/IIR: correct processing for zero input signal\n";
-        //TODO: Implement "Test 4
-//        *argv = ["./MUSI6106EXEC", "../../testAudio/0_test.wav","FIR", "0.05", "0.5"];
-//        int test4a = main(5, *argv);
-//        *argv = ["./MUSI6106EXEC", "../../testAudio/0_test.wav","IIR", "0.05", "0.5"];
-//        int test4b = main(5, *argv);
-        cout << "Test 5 One more additional MEANINGFUL test to verify your filter implementation\n";
-        //TODO: Implement Test 5
+        sInputFilePath = "../../testAudio/0_test.wav";
+        sOutputFilePath = "test4a_results.wav";
+        int test4a = applyCombFilter(sInputFilePath, sOutputFilePath, 0.5, 0.005, CCombFilterIf::kCombFIR, kBlockSize);
+        sOutputFilePath = "test4b_results.wav";
+        int test4b = applyCombFilter(sInputFilePath, sOutputFilePath, 0.5, 0.005, CCombFilterIf::kCombIIR, kBlockSize);
+        
+        
+        cout << "Test 5 Zero delay and gain should just return the original signal";
+        sInputFilePath = "../../testAudio/200_test.wav";
+        sOutputFilePath = "test5_results.wav";
+        int test5a = applyCombFilter(sInputFilePath, sOutputFilePath, 0.0, 0.0, CCombFilterIf::kCombFIR, kBlockSize);
+        int test5b = applyCombFilter(sInputFilePath, sOutputFilePath, 0.0, 0.0, CCombFilterIf::kCombIIR, kBlockSize);
 
         return -1;
     }
@@ -206,11 +205,7 @@ int main(int argc, char* argv[])
     }
 
     //////////////////////////////////////////////////////////////////////////////
-    int filterReturn = applyCombFilter(phInputAudioFile, phOutputAudioFile, phCombFilter,
-                    sInputFilePath, sOutputFilePath,
-                    ppfInputAudioData, ppfOutputAudioData, stFileSpec,
-                    f_gainValue, f_delayValue, eFilterType, kBlockSize);
-    // all done
+    int filterReturn = applyCombFilter(sInputFilePath, sOutputFilePath, f_gainValue, f_delayValue, eFilterType, kBlockSize);
     return filterReturn;
 
 }
